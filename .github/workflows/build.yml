@@ -1,0 +1,41 @@
+name: Build and test
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: windows-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+      - name: Set up MSYS2 and GCC
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: UCRT64
+          update: true
+          install: mingw-w64-ucrt-x86_64-gcc
+      - name: Build and test with GCC
+        shell: msys2 {0}
+        run: |
+          set -e
+          common="-std=c++20 -Wall -Wextra -pedantic -Isrc/domain -Isrc/physics -Isrc/integrators -Isrc/simulation -Isrc/visualization -Isrc/app"
+          g++ $common $(find src -name '*.cpp' -print) main.cpp -o simulator.exe
+          g++ $common src/domain/VectorND.cpp tests/vector_nd_test.cpp -o /tmp/vector_nd_test.exe
+          /tmp/vector_nd_test.exe
+          g++ $common src/domain/VectorND.cpp src/domain/CelestialBody.cpp tests/celestial_body_test.cpp -o /tmp/celestial_body_test.exe
+          /tmp/celestial_body_test.exe
+          g++ $common src/domain/VectorND.cpp src/domain/CelestialBody.cpp src/physics/GravityModel.cpp src/physics/Gravity3D.cpp src/physics/Gravity4D.cpp tests/gravity_model_test.cpp -o /tmp/gravity_model_test.exe
+          /tmp/gravity_model_test.exe
+          g++ $common $(find src/domain src/physics src/integrators -name '*.cpp' -print) tests/integrator_test.cpp -o /tmp/integrator_test.exe
+          /tmp/integrator_test.exe
+          g++ $common $(find src/domain src/physics src/integrators -name '*.cpp' -print) src/simulation/Simulation.cpp tests/simulation_test.cpp -o /tmp/simulation_test.exe
+          /tmp/simulation_test.exe
+          g++ $common $(find src -name '*.cpp' -print) tests/architecture_test.cpp -o /tmp/architecture_test.exe
+          /tmp/architecture_test.exe
+      - name: Smoke test 3D and 4D scenes
+        shell: msys2 {0}
+        run: |
+          ./simulator.exe --demo --frames 2
+          ./simulator.exe --demo --4d --frames 2
