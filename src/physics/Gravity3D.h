@@ -1,8 +1,8 @@
 #pragma once
 
-#include "PowerLawGravity.h"
+#include "GravityModel.h"
 
-class Gravity3D : public PowerLawGravity {
+class Gravity3D : public GravityModel {
 public:
     explicit Gravity3D(double gravitationalConstant);
     std::size_t dimension() const override;

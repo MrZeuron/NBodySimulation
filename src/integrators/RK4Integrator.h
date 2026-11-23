@@ -1,8 +1,8 @@
 #pragma once
 
-#include "RungeKuttaIntegrator.h"
+#include "Integrator.h"
 
-class RK4Integrator : public RungeKuttaIntegrator {
+class RK4Integrator : public Integrator {
 public:
     std::vector<CelestialBody> step(
         const std::vector<CelestialBody>& bodies,

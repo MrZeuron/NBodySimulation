@@ -11,7 +11,16 @@ public:
                const Integrator& integrator,
                double timeStep);
 
-    const std::vector<CelestialBody>& bodies() const;
+    Simulation(const std::vector<const CelestialBody*>& initialBodies,
+               const GravityModel& gravity, const Integrator& integrator,
+               double timeStep);
+
+    // Численный снимок содержит только общую физическую часть.
+    std::vector<CelestialBody> bodies() const;
+    const CelestialBody& body(std::size_t index) const;
+    std::size_t bodyCount() const;
+    std::size_t dimension() const;
+    void setGravityModel(const GravityModel& gravity);
     double time() const;
     double timeStep() const;
     double initialEnergy() const;
@@ -23,9 +32,9 @@ public:
     void reset();
 
 private:
-    std::vector<CelestialBody> initialBodies_;
-    std::vector<CelestialBody> bodies_;
-    const GravityModel& gravity_;
+    std::vector<std::unique_ptr<CelestialBody>> initialBodies_;
+    std::vector<std::unique_ptr<CelestialBody>> bodies_;
+    const GravityModel* gravity_;
     const Integrator* integrator_;
     double timeStep_;
     double time_;

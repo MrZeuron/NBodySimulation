@@ -18,3 +18,10 @@ AGENTS.md
 .vscode/
 .vs/
 .idea/
+
+# Local build output
+build/
+cmake-build-*/
+compile_commands.json
+*.gcda
+*.gcno
